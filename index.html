@@ -116,8 +116,8 @@
 
 <div class="question-container"></div>
 
-<audio id="successAudio" src="success-sound.mp3"></audio>
-<audio id="failAudio" src="fail-sound.mp3"></audio>
+<audio id="successAudio" src="success-sound.mp3" preload="auto"></audio>
+<audio id="failAudio" src="fail-sound.mp3" preload="auto"></audio>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -655,6 +655,9 @@
         function checkAnswer(selectedIndex, correctIndex) {
             const isCorrect = selectedIndex === correctIndex;
             const audio = isCorrect ? document.getElementById('successAudio') : document.getElementById('failAudio');
+            
+            // Παίζει τον ήχο
+            audio.currentTime = 0; // Επαναφέρει τον ήχο στην αρχή αν έχει ήδη παίξει
             audio.play();
             
             if (isCorrect) {
