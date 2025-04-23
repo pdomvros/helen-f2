@@ -75,6 +75,7 @@
             margin-left: auto;
             margin-right: auto;
             text-align: left;
+            transition: background-color 0.3s;
         }
         .answer:hover {
             background-color: #999;
@@ -93,6 +94,23 @@
             color: gold;
             margin-top: 20px;
         }
+        .start-screen {
+            margin-top: 50px;
+        }
+        .start-btn {
+            background-color: #0b3d91;
+            color: gold;
+            border: none;
+            padding: 15px 30px;
+            font-size: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .start-btn:hover {
+            background-color: #1a4da1;
+        }
     </style>
 </head>
 <body>
@@ -110,11 +128,18 @@
     🎭 🏛️ 🎭 🏛️ 🎭
 </div>
 
-<div class="score-box">
+<div class="score-box hidden">
     Σκορ: <span id="score">0</span> / 100
 </div>
 
-<div class="question-container"></div>
+<div class="start-screen" id="startScreen">
+    <div class="question">
+        Κάντε κλικ στο κουμπί για να ξεκινήσετε το κουίζ
+    </div>
+    <button class="start-btn" id="startBtn">Έναρξη Κουίζ</button>
+</div>
+
+<div class="question-container hidden" id="questionContainer"></div>
 
 <audio id="successAudio" src="success-sound.mp3" preload="auto"></audio>
 <audio id="failAudio" src="fail-sound.mp3" preload="auto"></audio>
@@ -510,7 +535,7 @@
                     'α) Την πλήρη απουσία θρησκείας',
                     'β) Τον ρεαλισμό και την ανθρωποκεντρική προσέγγιση',
                     'γ) Την άρνηση της μυθολογίας',
-                    'δ) Την αδυναμία του Ευριπίδη'
+                    'δ) Την αδυναμία του Ευριπίδης'
                 ],
                 correct: 1
             },
@@ -627,7 +652,37 @@
         ];
         
         const theaterEmojis = ['🎭', '🏛️', '🎭', '🏛️', '🎭'];
-        const container = document.querySelector('.question-container');
+        const container = document.getElementById('questionContainer');
+        const startScreen = document.getElementById('startScreen');
+        const startBtn = document.getElementById('startBtn');
+        const scoreBox = document.querySelector('.score-box');
+        const successAudio = document.getElementById('successAudio');
+        const failAudio = document.getElementById('failAudio');
+
+        // Προετοιμασία ήχων
+        function initAudio() {
+            // Προσπάθεια να παίξουμε και να σταματήσουμε αμέσως τον ήχο
+            // για να "ξεκλειδώσουμε" τον αυτόματο ήχο στα browsers
+            const playPromise = successAudio.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    successAudio.pause();
+                    successAudio.currentTime = 0;
+                })
+                .catch(error => {
+                    console.log("Audio autoplay prevented:", error);
+                });
+            }
+        }
+
+        startBtn.addEventListener('click', function() {
+            startScreen.classList.add('hidden');
+            container.classList.remove('hidden');
+            scoreBox.classList.remove('hidden');
+            initAudio();
+            showQuestion(0);
+        });
 
         function showQuestion(index) {
             container.innerHTML = '';
@@ -652,13 +707,23 @@
             });
         }
 
+        function playAudio(audioElement) {
+            const playPromise = audioElement.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log("Audio playback failed:", error);
+                });
+            }
+        }
+
         function checkAnswer(selectedIndex, correctIndex) {
             const isCorrect = selectedIndex === correctIndex;
-            const audio = isCorrect ? document.getElementById('successAudio') : document.getElementById('failAudio');
+            const audio = isCorrect ? successAudio : failAudio;
             
             // Παίζει τον ήχο
-            audio.currentTime = 0; // Επαναφέρει τον ήχο στην αρχή αν έχει ήδη παίξει
-            audio.play();
+            audio.currentTime = 0;
+            playAudio(audio);
             
             if (isCorrect) {
                 score += 2; // Each correct answer gives 2 points
@@ -692,8 +757,6 @@
                 }
             }, 2000);
         }
-
-        showQuestion(0);
     });
 </script>
 </body>
