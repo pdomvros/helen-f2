@@ -654,7 +654,7 @@
 
         function checkAnswer(selectedIndex, correctIndex) {
             const isCorrect = selectedIndex === correctIndex;
-            const audio = isCorrect ? document.getElementById('successAudio') : document.getElementById('failAudio');
+            const audio = isCorrect ? document.getElementById('success-sound.mp3') : document.getElementById('fail-sound.mp3');
             
             // Παίζει τον ήχο
             audio.currentTime = 0; // Επαναφέρει τον ήχο στην αρχή αν έχει ήδη παίξει
